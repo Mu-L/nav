@@ -147,6 +147,9 @@ export interface ISettings {
   spiderIcon: Spider
   spiderDescription: Spider
   spiderTitle: Spider
+  spiderQty: number
+
+  loadingCode: string
 }
 
 export interface IConfig {

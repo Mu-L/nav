@@ -51,34 +51,37 @@
       {{ $t('_logoutAuthCode') }}
     </button>
 
-    <div class="mb10 mt10">
-      <b
-        >用户提交的收录数据存储在服务器内存当中，您的信息是安全的，在某一个时刻会清除，最多存储100个收录，请及时处理。</b
-      >
-    </div>
+    <button
+      class="ml10"
+      nz-button
+      (click)="getUserCollect()"
+      [nzLoading]="submitting"
+    >
+      {{ $t('_refresh') }}
+    </button>
+
     <div class="mb10 mt10">
       <b>处理完成所有数据后需要点击一次保存方可生效</b>
     </div>
-    <nz-table #basicTable [nzData]="dataList">
+    <nz-table #basicTable [nzData]="dataList" [nzShowPagination]="false">
       <thead>
         <tr>
           <th nzWidth="80px">{{ $t('_action') }}</th>
           <th nzWidth="80px">{{ $t('_icon') }}</th>
           <th nzWidth="100px">{{ $t('_webName') }}</th>
           <th nzWidth="100px">{{ $t('_webTag') }}</th>
-          <th nzWidth="120px">{{ $t('_onlyOwnVisible') }}</th>
           <th nzWidth="300px">{{ $t('_webDesc') }}</th>
           <th nzWidth="300px">分类位置</th>
           <th>{{ $t('_createAt') }}</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let data of dataList; index as idx">
+        <tr *ngFor="let data of dataList; index as idx; trackBy: trackByItem">
           <td>
             <div>
               <a (click)="handleConfirmGet(data, idx)">{{ $t('_collect') }}</a>
             </div>
-            <div>
+            <div class="mt10">
               <a
                 nz-popconfirm
                 nzPopconfirmPlacement="rightTop"
@@ -112,20 +115,12 @@
             </nz-tag>
           </td>
           <td>
-            <i
-              *ngIf="data.ownVisible"
-              nz-icon
-              nzType="check"
-              nzTheme="outline"
-            ></i>
-          </td>
-          <td>
             <pre class="desc">{{ data.desc }}</pre>
           </td>
-          <th nzWidth="300px" *ngIf="data.extra">
+          <td nzWidth="300px" *ngIf="data.extra">
             {{ data.extra.oneName }} / {{ data.extra.twoName }} /
             {{ data.extra.threeName }}
-          </th>
+          </td>
           <td>{{ data.createdAt }}</td>
         </tr>
       </tbody>

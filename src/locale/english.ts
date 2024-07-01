@@ -6,6 +6,8 @@ const english: Record<string, string> = {
   _copyUrl: 'Copy Link',
   _shareWeb: 'Share site',
   _edit: 'Edit',
+  _sort: 'Sort',
+  _refresh: 'Refresh',
   _add: 'Add',
   _del: 'Delete',
   _apply: 'Apply',
@@ -180,7 +182,8 @@ const english: Record<string, string> = {
   _followPage: 'Follow Page',
   _bannerTip:
     'When the height is 0, the width and height of the image will be adaptive, and it is important to ensure that each image has the same size',
-  _checkStatus: 'Check website link status',
+  _checkStatus:
+    'Check website link status(For any of the above updates, it is recommended to enable this, as it takes the same amount of time.)',
   _ignore:
     '(This function is not very useful, it is recommended to ignore or remove it)',
   _standard: 'Standard',
@@ -207,7 +210,13 @@ const english: Record<string, string> = {
   _spiderAlways: 'Always update',
   _spiderStatus: 'Spider Status',
   _spiderTip:
-    'Crawling rules will be triggered every time saving, affecting the construction speed. If necessary, crawling updates will be made. It is recommended to set crawling completion to no crawling',
+    'Crawling rules will be triggered every time saving, affecting the construction speed. Crawling and updating information may be necessary when necessary',
+  _spiderQty: 'Concurrent quantity',
+  _spiderQtyTip: '',
+  _spiderNetTip:
+    'Due to network factors, some websites may not be accessible and can be skipped directly. For reference only',
+  _spiderBuildTip:
+    'After the construction is completed, the data is correct. Please go to the website management and click save once, otherwise the data will not be permanently stored',
 }
 
 export default english

@@ -12,12 +12,11 @@ import {
 import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms'
 import { IWebProps } from 'src/types'
 import { NzMessageService } from 'ng-zorro-antd/message'
-import { NzNotificationService } from 'ng-zorro-antd/notification'
 import { createFile, saveUserCollect } from 'src/services'
 import { $t } from 'src/locale'
 import { settings, websiteList, tagList, tagMap } from 'src/store'
 import event from 'src/utils/mitt'
-import { getToken } from 'src/utils/user'
+import { isLogin } from 'src/utils/user'
 
 @Component({
   selector: 'app-create-web',
@@ -28,7 +27,7 @@ export class CreateWebComponent {
   @Output() onOk = new EventEmitter()
 
   $t = $t
-  isLogin: boolean = !!getToken()
+  isLogin: boolean = isLogin
   validateForm!: FormGroup
   iconUrl = ''
   tagList = tagList
@@ -42,11 +41,7 @@ export class CreateWebComponent {
   threeIndex: number | undefined
   callback: Function = () => {}
 
-  constructor(
-    private fb: FormBuilder,
-    private message: NzMessageService,
-    private notification: NzNotificationService
-  ) {
+  constructor(private fb: FormBuilder, private message: NzMessageService) {
     event.on('CREATE_WEB', (props: any) => {
       this.open(this, props)
     })
@@ -64,6 +59,7 @@ export class CreateWebComponent {
       rate: [5],
       icon: [''],
       desc: [''],
+      index: [''],
       urlArr: this.fb.array([]),
     })
   }
@@ -91,6 +87,7 @@ export class CreateWebComponent {
     ctx.threeIndex = props.threeIndex
     this.validateForm.get('title')!.setValue(getTextContent(detail?.name))
     this.validateForm.get('desc')!.setValue(getTextContent(detail?.desc))
+    this.validateForm.get('index')!.setValue(detail?.index ?? '')
     this.validateForm.get('icon')!.setValue(detail?.icon || '')
     this.validateForm.get('url')!.setValue(detail?.url || '')
     this.validateForm.get('top')!.setValue(detail?.top ?? false)
@@ -133,29 +130,20 @@ export class CreateWebComponent {
     }
     this.getting = true
     const res = await getWebInfo(url)
-    if (res['url']) {
+    if (res['url'] != null) {
       this.iconUrl = res['url']
       this.validateForm.get('icon')!.setValue(this.iconUrl)
     }
-    if (res['title']) {
+    if (res['title'] != null) {
       this.validateForm.get('title')!.setValue(res['title'])
     }
-    if (res['description']) {
+    if (res['description'] != null) {
       this.validateForm.get('desc')!.setValue(res['description'])
     }
-    if (!res['title']) {
+    if (res['status'] === false) {
       this.message.error('自动抓取失败，请手动写入')
     }
     this.getting = false
-  }
-
-  onIconFocus() {
-    document.addEventListener('paste', this.handlePasteImage)
-  }
-
-  onIconBlur(e: any) {
-    document.removeEventListener('paste', this.handlePasteImage)
-    this.iconUrl = e.target.value
   }
 
   addMoreUrl() {
@@ -172,24 +160,6 @@ export class CreateWebComponent {
   lessMoreUrl(idx: number) {
     // @ts-ignore
     this.validateForm.get('urlArr').removeAt(idx)
-  }
-
-  handlePasteImage = (event: any) => {
-    const items = event.clipboardData.items
-    let file = null
-
-    if (items.length) {
-      for (let i = 0; i < items.length; i++) {
-        if (items[i].type.startsWith('image')) {
-          file = items[i].getAsFile()
-          break
-        }
-      }
-    }
-
-    if (file) {
-      this.handleUploadImage(file)
-    }
   }
 
   handleUploadImage(file: File) {
@@ -212,12 +182,6 @@ export class CreateWebComponent {
         .then(() => {
           that.validateForm.get('icon')!.setValue(path)
           that.message.success($t('_uploadSuccess'))
-        })
-        .catch((res) => {
-          that.notification.error(
-            `${$t('_error')}: ${res?.response?.status ?? 401}`,
-            `${$t('_uploadFail')}：${res.message || ''}`
-          )
         })
         .finally(() => {
           that.uploading = false
@@ -242,9 +206,9 @@ export class CreateWebComponent {
       this.validateForm.controls[i].updateValueAndValidity()
     }
 
-    const createdAt = new Date().toISOString()
+    const createdAt = new Date().toString()
     let urls: Record<string, any> = {}
-    let { title, icon, url, top, ownVisible, rate, desc } =
+    let { title, icon, url, top, ownVisible, rate, desc, index } =
       this.validateForm.value
 
     if (!title || !url) return
@@ -264,6 +228,7 @@ export class CreateWebComponent {
       rate: rate ?? 5,
       desc: desc || '',
       top: top ?? false,
+      index,
       ownVisible: ownVisible ?? false,
       icon,
       url,

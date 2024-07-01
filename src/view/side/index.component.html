@@ -15,7 +15,7 @@
       >
         <ng-template #titleTpl>
           <img *ngIf="item.icon" class="sideicon" [src]="item.icon" />
-          <span>{{ item.title }}</span>
+          <span class="menu-title ellipsis">{{ item.title }}</span>
         </ng-template>
 
         <ul>
@@ -102,6 +102,7 @@
                       [cardStyle]="settings.sideCardStyle"
                       [dataSource]="el"
                       [indexs]="[page, id, i, j]"
+                      [searchKeyword]="searchKeyword"
                       class="column-border"
                     ></app-card>
                   </div>
